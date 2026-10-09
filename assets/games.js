@@ -25,7 +25,7 @@ window.GAMES = [
   {
     id: 'dua-xe', title: 'Đua Xe Tốc Độ', cats: ['dua-xe', 'hanh-dong'],
     status: 'live', badge: 'hot', featured: true, added: '2026-10-09',
-    url: 'games/dua-xe/index.html',
+    url: 'games/dua-xe/index.html', landscape: true,
     thumb: 'assets/thumbs/dua-xe.jpg', hero: 'assets/thumbs/dua-xe-hero.jpg',
     desc: 'Cầm lái siêu xe trên đường đua 3D đầy khúc cua và đồi dốc. Vượt qua dòng xe cộ, giữ xe trên đường và bật nitro đúng lúc để hoàn thành 3 vòng đua nhanh nhất!',
     longDesc: 'Đường đua đi qua rừng dừa nhiệt đới, rừng cây xanh và vùng núi thông. Vào cua quá nhanh xe sẽ bị văng ra ngoài, đâm vào xe khác hay cây cối sẽ bị giảm tốc. Thời gian tốt nhất của bạn được lưu lại làm kỷ lục.',
@@ -70,7 +70,7 @@ window.GAMES = [
     emoji: '✏️', colors: ['#43cea2', '#185a9d'], desc: 'Điền số từ 1 đến 9 sao cho mỗi hàng, cột và ô vuông đều không trùng lặp.' },
   {
     id: 'sut-penalty', title: 'Sút Penalty', cats: ['the-thao'], status: 'live', badge: 'new', added: '2026-10-09',
-    url: 'games/sut-penalty/index.html', thumb: 'assets/thumbs/sut-penalty.jpg',
+    url: 'games/sut-penalty/index.html', landscape: true, thumb: 'assets/thumbs/sut-penalty.jpg',
     emoji: '⚽', colors: ['#56ab2f', '#1e5e1a'],
     desc: 'Đấu loạt sút luân lưu 5 lượt với máy: căn góc, lấy lực sút tung lưới thủ môn, rồi đổi vai bay người cản phá cú sút của đối thủ!',
     longDesc: 'Khi sút: chọn điểm trong khung thành rồi dừng thanh lực đúng lúc. Sút càng mạnh bóng càng nhanh nhưng dễ lệch hướng hoặc vọt xà. Khi bắt gôn: đoán hướng và bay người thật nhanh. Hòa sau 5 lượt sẽ đá luân lưu cân não đến khi phân thắng bại. Có 3 độ khó và lưu thành tích thắng/thua.',

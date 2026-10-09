@@ -81,6 +81,25 @@ h2{font-size:clamp(32px,8vw,48px);font-weight:900;font-style:italic;margin-botto
 .how b{color:#fff}
 .big-score{font-size:clamp(52px,13vw,84px);font-weight:900;font-style:italic;color:var(--accent);line-height:1.05;font-variant-numeric:tabular-nums}
 .stats{font-size:14px;color:var(--muted);margin:10px 0 20px;line-height:1.5}
+@media (max-width:620px){
+  #board{top:64px;min-width:0}
+}
+@media (max-height:520px){
+  #board{left:12px;top:12px;transform:none;min-width:0;padding:6px 10px 8px}
+  .dot{width:13px;height:13px;font-size:8px}
+  .bscore{font-size:16px}
+  #tip{left:12px;bottom:10px;transform:none;max-width:42%;font-size:12px;padding:8px 12px;border-radius:14px;text-align:left}
+  .card{padding:16px 20px}
+  h1{font-size:38px;margin-bottom:8px}
+  h1 span{display:inline}
+  .tag,.sub,.how{display:none}
+  .opt{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+  .opt .lbl{margin:0}
+  .btn{padding:11px 28px;font-size:17px}
+  .record{margin-top:8px}
+  .big-score{font-size:48px}
+  .stats{margin:6px 0 12px}
+}
 </style>
 </head>
 <body data-state="menu">

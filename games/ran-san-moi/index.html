@@ -78,6 +78,23 @@ body.touch .touch-hint{display:block}
 .badge{display:inline-block;margin:6px 0 2px;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:900;letter-spacing:.14em;background:linear-gradient(90deg,#ff2d55,#ff9f1a)}
 .badge[hidden]{display:none}
 .stats{font-size:14px;color:var(--muted);margin:10px 0 20px}
+@media (max-width:560px){
+  #hud{left:12px;transform:none;gap:6px}
+  .pill{padding:6px 12px;font-size:17px}
+}
+@media (max-height:520px){
+  .card{padding:16px 20px}
+  h1{font-size:38px;margin-bottom:8px}
+  h1 span{display:inline}
+  .tag,.sub,.controls,.touch-hint{display:none}
+  body.touch .touch-hint{display:none}
+  .opt{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+  .opt .lbl{margin:0;min-width:64px;text-align:right}
+  .btn{padding:11px 28px;font-size:17px}
+  .record{margin-top:8px}
+  .big-score{font-size:48px}
+  .stats{margin:6px 0 12px}
+}
 </style>
 </head>
 <body data-state="menu">

@@ -119,6 +119,29 @@ body.touch #touch{display:flex}
 .tbtn.brake{background:rgba(200,40,40,.5)}
 .tbtn.on{transform:scale(.92);filter:brightness(1.5)}
 body.touch #speedo{bottom:auto;top:68px;right:14px;transform:scale(.72);transform-origin:top right}
+@media (max-width:440px){
+  #hud{top:12px;left:12px;gap:2px 12px;padding:7px 11px;border-radius:12px}
+  #hud .stat:nth-child(n+3){display:none}
+  .stat .lbl{font-size:9px}
+  .stat .val{font-size:16px}
+  #touch{padding-left:10px;padding-right:10px}
+  #touch .grp{gap:6px}
+  .tbtn{width:60px;height:60px;font-size:18px}
+  .tbtn.small{width:50px;height:50px;font-size:10px}
+  .tbtn.gas{width:70px;height:70px;font-size:16px}
+}
+@media (max-height:520px){
+  .card{padding:16px 20px}
+  h1{font-size:40px;margin-bottom:8px}
+  h1 .l1,h1 .l2{display:inline}
+  .tag,.sub,.touch-hint,.controls{display:none}
+  body.touch .touch-hint{display:none}
+  .btn{padding:11px 28px;font-size:17px}
+  .record{margin-top:10px}
+  .big-time{font-size:40px}
+  .laps{margin:8px auto}
+  .laps li{padding:4px 12px}
+}
 @media (max-width:760px){
   #progress{display:none}
   #hud{gap:4px 12px;padding:8px 12px}

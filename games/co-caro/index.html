@@ -77,6 +77,26 @@ h2{font-size:clamp(30px,7vw,44px);font-weight:900;font-style:italic;margin-botto
 body.touch .keys{display:none}
 kbd{display:inline-block;min-width:22px;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid var(--line);border-bottom-width:3px;color:#fff;font:700 11px/1.3 system-ui,sans-serif}
 
+/* Điện thoại cầm ngang: thông tin bên trái, nút bên phải, bàn cờ ở giữa */
+@media (orientation:landscape) and (max-height:520px){
+  #top{top:50%;left:12px;transform:translateY(-50%);flex-direction:column;align-items:stretch;gap:8px}
+  .pcard{min-width:0;width:176px}
+  .score{text-align:center;font-size:22px}
+  #bar{left:auto;right:12px;bottom:auto;top:50%;transform:translateY(-50%);flex-direction:column;gap:6px;padding:6px}
+  #bar .lbl{display:none}
+  #bar button,#bar a{width:42px;height:40px;min-width:0;padding:0}
+}
+@media (max-height:520px){
+  .card{padding:14px 20px}
+  h1{font-size:36px;margin-bottom:6px}
+  .tag,.sub,.keys,.opt .note{display:none}
+  .opt{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+  .opt .lbl{margin:0;min-width:56px;text-align:right}
+  .seg button{padding:6px 12px;font-size:13px}
+  .btn{padding:10px 26px;font-size:16px}
+  .record{margin-top:8px}
+  .emoji{font-size:40px}
+}
 @media (max-width:620px){
   .pcard{min-width:0;padding:6px 10px 6px 6px;gap:8px}
   .pcard small{display:none}
@@ -612,11 +632,13 @@ function resize() {
   dpr = Math.min(window.devicePixelRatio || 1, 2);
   W = canvas.width = Math.round(window.innerWidth * dpr);
   H = canvas.height = Math.round(window.innerHeight * dpr);
-  const top = 72 * dpr, bottom = 84 * dpr;
-  const avail = Math.min(W - 20 * dpr, H - top - bottom);
+  const side = window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches;
+  const top = (side ? 14 : 72) * dpr, bottom = (side ? 14 : 84) * dpr;
+  const left = (side ? 204 : 10) * dpr, right = (side ? 70 : 10) * dpr;
+  const avail = Math.min(W - left - right, H - top - bottom);
   cell = Math.max(14 * dpr, Math.floor(avail / N));
   bs = cell * N;
-  bx = Math.round((W - bs) / 2);
+  bx = Math.round(left + Math.max(0, (W - left - right - bs) / 2));
   by = Math.round(top + Math.max(0, (H - top - bottom - bs) / 2));
 }
 function rr(x, y, w, h, r) {

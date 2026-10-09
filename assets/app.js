@@ -256,7 +256,7 @@ function coverHTML(g) {
       <h1>${esc(g.title)}</h1>
       ${live
         ? `<button class="btn primary big" id="playBtn">▶ CHƠI NGAY</button>
-           <p class="cover-hint">${isTouch ? 'Nên xoay ngang điện thoại để chơi tốt hơn' : 'Miễn phí · Không cần tải · Chơi ngay trên trình duyệt'}</p>`
+           <p class="cover-hint">${isTouch && g.landscape ? 'Nên xoay ngang điện thoại để chơi tốt hơn' : 'Miễn phí · Không cần tải · Chơi ngay trên trình duyệt'}</p>`
         : `<span class="status">🚧 GAME ĐANG PHÁT TRIỂN</span>
            <p class="cover-hint">Trò chơi này sẽ sớm ra mắt. Quay lại sau nhé!</p>
            ${firstLive ? `<a class="btn ghost" href="game.html?id=${firstLive.id}">▶ Chơi ${esc(firstLive.title)}</a>` : ''}`}
