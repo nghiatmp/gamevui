@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Cờ Caro</title>
+<style>
+:root{
+  --accent:#ffd54a; --x:#e0302f; --o:#1f5fd6; --panel:rgba(12,16,38,.78); --line:rgba(255,255,255,.14); --muted:rgba(255,255,255,.68);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#090d22;color:#fff;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+#top{position:fixed;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;z-index:5;max-width:calc(100% - 16px)}
+.pcard{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border-radius:14px;background:var(--panel);border:2px solid transparent;
+  min-width:150px;transition:border-color .2s,box-shadow .2s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.pcard.on.x{border-color:var(--x);box-shadow:0 0 0 4px rgba(224,48,47,.2)}
+.pcard.on.o{border-color:#4f8bff;box-shadow:0 0 0 4px rgba(79,139,255,.2)}
+.pcard b{display:block;font-size:14px;font-weight:900;letter-spacing:.04em;white-space:nowrap}
+.pcard small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;min-height:15px}
+.sym{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:20px;font-weight:900;background:#fdfcf5;flex-shrink:0}
+.sym.x{color:var(--x)} .sym.o{color:var(--o)}
+.score{font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;padding:0 6px;white-space:nowrap}
+.score i{font-style:normal;color:var(--muted);margin:0 6px}
+.dots::after{content:"";animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+#bar{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:8px;z-index:5;
+  padding:8px;border-radius:16px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#bar button,#bar a{height:44px;min-width:44px;padding:0 14px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;
+  font:800 14px/1 system-ui,sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;white-space:nowrap}
+#bar button:hover,#bar a:hover{background:rgba(255,255,255,.14)}
+#bar button:disabled{opacity:.35;cursor:not-allowed}
+#bar .ico{padding:0;width:44px;font-size:17px}
+body.embedded #homeBtn{display:none}
+
+#flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:min(9vmin,60px);font-weight:900;font-style:italic;color:#fff;
+  text-shadow:0 4px 0 rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.55);pointer-events:none;opacity:0;white-space:nowrap;z-index:6}
+#flash.show{animation:flash 1.4s ease-out forwards}
+@keyframes flash{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}25%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:10;
+  background:radial-gradient(ellipse at center,rgba(5,8,24,.45),rgba(5,8,24,.85))}
+.screen.light{background:rgba(5,8,24,.45)}
+.screen[hidden]{display:none}
+.card{width:100%;max-width:500px;max-height:100%;overflow:auto;padding:26px 24px;text-align:center;background:rgba(12,16,38,.92);
+  border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.card.small{max-width:380px}
+.tag{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--accent);border:1px solid rgba(255,213,74,.4);padding:5px 10px;border-radius:99px;margin-bottom:12px}
+h1{font-size:clamp(46px,11vw,76px);line-height:.95;font-weight:900;font-style:italic;margin-bottom:12px}
+h1 .x{color:#ff5a59} h1 .o{color:#5b92ff}
+h2{font-size:clamp(30px,7vw,44px);font-weight:900;font-style:italic;margin-bottom:6px}
+.emoji{font-size:54px;line-height:1;margin-bottom:6px}
+.sub{color:var(--muted);font-size:15px;line-height:1.5;margin:0 auto 18px;max-width:400px}
+.opt{margin-bottom:12px}
+.opt[hidden]{display:none}
+.opt .lbl{display:block;font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--muted);margin-bottom:6px}
+.opt .note{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+.seg{display:inline-flex;flex-wrap:wrap;justify-content:center;padding:4px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--line);gap:4px}
+.seg button{padding:8px 15px;border-radius:999px;font:800 14px/1.1 system-ui,sans-serif;color:var(--muted);background:none;border:0;cursor:pointer}
+.seg button:hover{color:#fff}
+.seg button.on{background:#fff;color:#0c1230}
+.btn{display:inline-block;border:0;cursor:pointer;font:inherit;font-size:18px;font-weight:900;font-style:italic;letter-spacing:.06em;color:#241500;
+  padding:13px 30px;border-radius:999px;background:linear-gradient(180deg,#ffe27a,#ffb020);box-shadow:0 5px 0 #b56a00,0 12px 30px rgba(255,170,0,.3);
+  transition:transform .08s,box-shadow .08s;margin-top:6px}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #b56a00}
+.btn.ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 2px var(--line)}
+.btn.ghost:active{transform:translateY(2px)}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.record{margin-top:14px;font-size:13px;color:var(--muted)}
+.record b{color:var(--accent)}
+.keys{margin-top:12px;font-size:12px;color:var(--muted)}
+body.touch .keys{display:none}
+kbd{display:inline-block;min-width:22px;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid var(--line);border-bottom-width:3px;color:#fff;font:700 11px/1.3 system-ui,sans-serif}
+
+@media (max-width:620px){
+  .pcard{min-width:0;padding:6px 10px 6px 6px;gap:8px}
+  .pcard small{display:none}
+  .sym{width:28px;height:28px;font-size:16px}
+  .score{font-size:20px}
+  #bar .lbl{display:none}
+  #bar button,#bar a{padding:0;width:44px}
+}
+</style>
+</head>
+<body data-state="menu">
+<canvas id="game"></canvas>
+
+<div id="top">
+  <div class="pcard x" id="pX"><span class="sym x">✕</span><div><b id="nX">BẠN</b><small id="sX"></small></div></div>
+  <div class="score"><span id="scX">0</span><i>:</i><span id="scO">0</span></div>
+  <div class="pcard o" id="pO"><span class="sym o">◯</span><div><b id="nO">MÁY</b><small id="sO"></small></div></div>
+</div>
+
+<div id="bar">
+  <button data-act="undo" title="Đi lại (U)">↶ <span class="lbl">Đi lại</span></button>
+  <button data-act="hint" title="Gợi ý (H)">💡 <span class="lbl">Gợi ý</span></button>
+  <button data-act="new" title="Ván mới (N)">↻ <span class="lbl">Ván mới</span></button>
+  <button data-act="menu" title="Menu">☰ <span class="lbl">Menu</span></button>
+  <button class="ico" id="muteBtn" title="Âm thanh (M)" aria-label="Bật/tắt âm thanh">🔊</button>
+  <a class="ico" id="homeBtn" href="../../index.html" target="_top" title="Về trang chủ" aria-label="Về trang chủ">⌂</a>
+</div>
+<div id="flash"></div>
+
+<div class="screen" id="menu">
+  <div class="card">
+    <div class="tag">GAME TRÍ TUỆ</div>
+    <h1>CỜ <span class="x">CA</span><span class="o">RO</span></h1>
+    <p class="sub">Xếp đủ 5 quân liên tiếp theo hàng ngang, dọc hoặc chéo để giành chiến thắng!</p>
+    <div class="opt"><span class="lbl">CHẾ ĐỘ</span>
+      <div class="seg" data-opt="mode"><button data-v="ai">🤖 Đấu với máy</button><button data-v="pvp">👥 2 người</button></div>
+    </div>
+    <div class="opt" data-ai><span class="lbl">ĐỘ KHÓ</span>
+      <div class="seg" data-opt="diff"><button data-v="de">Dễ</button><button data-v="thuong">Thường</button><button data-v="kho">Khó</button><button data-v="legend">👑 Huyền thoại</button></div>
+    </div>
+    <div class="opt" data-ai><span class="lbl">ĐI TRƯỚC</span>
+      <div class="seg" data-opt="first"><button data-v="me">Bạn đi trước (X)</button><button data-v="ai">Máy đi trước</button></div>
+    </div>
+    <div class="opt"><span class="lbl">LUẬT</span>
+      <div class="seg" data-opt="block"><button data-v="free">Tự do</button><button data-v="block">Chặn 2 đầu</button></div>
+      <span class="note" id="ruleNote"></span>
+    </div>
+    <button class="btn" data-act="start">BẮT ĐẦU ▶</button>
+    <div class="record" id="menuRecord"></div>
+    <div class="keys"><kbd>U</kbd> đi lại · <kbd>H</kbd> gợi ý · <kbd>N</kbd> ván mới · <kbd>M</kbd> tắt tiếng</div>
+  </div>
+</div>
+
+<div class="screen light" id="over" hidden>
+  <div class="card small">
+    <div class="emoji" id="ovEmoji">🎉</div>
+    <h2 id="ovTitle">BẠN THẮNG!</h2>
+    <p class="sub" id="ovSub"></p>
+    <div class="btns">
+      <button class="btn" data-act="new">VÁN MỚI ↻</button>
+      <button class="btn ghost" data-act="view">XEM BÀN CỜ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const N = 15, X = 1, O = 2;
+const el = id => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } },
+};
+const DIFFS = { de: 'Dễ', thuong: 'Thường', kho: 'Khó', legend: 'Huyền thoại' };
+const settings = Object.assign({ mode: 'ai', diff: 'thuong', first: 'me', block: 'free' }, store.get('caro.settings', {}));
+const record = store.get('caro.record', {});
+const isTouch = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+const DR = [[0, 1], [1, 0], [1, 1], [1, -1]];
+
+// ================= State =================
+const canvas = el('game'), ctx = canvas.getContext('2d');
+let W = 0, H = 0, dpr = 1, cell = 30, bx = 0, by = 0, bs = 0;
+let board = new Int8Array(N * N), moves = [], turn = X, state = 'menu';
+let winLine = null, winner = 0, winT = 0, overTimer = 0, thinkTimer = 0;
+let hover = null, pending = null, hint = null, clock = 0, hintsUsed = 0;
+let session = { [X]: 0, [O]: 0, d: 0 };
+
+const me = () => settings.first === 'me' ? X : O;
+const aiSym = () => 3 - me();
+const vsAI = () => settings.mode === 'ai';
+const humanTurn = () => !vsAI() || turn === me();
+const inB = (r, c) => r >= 0 && c >= 0 && r < N && c < N;
+
+// ================= Sound =================
+const Sound = {
+  ctx: null, muted: store.get('caro.muted', false),
+  init() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try {
+      const c = this.ctx = new AC();
+      this.master = c.createGain(); this.master.gain.value = this.muted ? 0 : 0.8; this.master.connect(c.destination);
+      const len = Math.floor(c.sampleRate * 0.2);
+      this.noise = c.createBuffer(1, len, c.sampleRate);
+      const d = this.noise.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    } catch (e) { this.ctx = null; }
+  },
+  tone(f1, f2, dur, type = 'sine', vol = 0.15, delay = 0) {
+    if (!this.ctx) return;
+    const c = this.ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t + dur + 0.02);
+  },
+  tick(high) {
+    if (!this.ctx) return;
+    const c = this.ctx, t = c.currentTime, s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noise; fl.type = 'bandpass'; fl.frequency.value = high ? 3200 : 2200; fl.Q.value = 2;
+    g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    s.connect(fl); fl.connect(g); g.connect(this.master); s.start(t); s.stop(t + 0.1);
+  },
+  win() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, f, i === 3 ? 0.5 : 0.14, 'square', 0.1, i * 0.12)); },
+  lose() { [392, 349, 311, 262].forEach((f, i) => this.tone(f, f * 0.98, 0.28, 'triangle', 0.15, i * 0.2)); },
+  hint() { this.tone(880, 1320, 0.18, 'triangle', 0.12); },
+  setMuted(m) { this.muted = m; if (this.master) this.master.gain.value = m ? 0 : 0.8; store.set('caro.muted', m); },
+};
+
+// ================= Rules =================
+function checkWin(r, c, who) {
+  for (const [dr, dc] of DR) {
+    const line = [{ r, c }];
+    let rr = r + dr, cc = c + dc;
+    while (inB(rr, cc) && board[rr * N + cc] === who) { line.push({ r: rr, c: cc }); rr += dr; cc += dc; }
+    const end1 = inB(rr, cc) ? board[rr * N + cc] : -1;
+    rr = r - dr; cc = c - dc;
+    while (inB(rr, cc) && board[rr * N + cc] === who) { line.unshift({ r: rr, c: cc }); rr -= dr; cc -= dc; }
+    const end2 = inB(rr, cc) ? board[rr * N + cc] : -1;
+    if (line.length >= 5) {
+      if (settings.block === 'block' && end1 === 3 - who && end2 === 3 - who) continue;
+      return line;
+    }
+  }
+  return null;
+}
+
+// ================= AI =================
+// Mỗi hướng được mã hóa thành 9 ô (cơ số 3) quanh ô đang xét, điểm được tra theo mẫu và lưu cache.
+const POW3 = [1, 3, 9, 27, 81, 243, 729, 2187, 6561];
+const dirCache = new Float64Array(19683).fill(-1);
+const PATTERNS = [
+  ['xxxxx', 1e6],
+  ['_xxxx_', 1e5],
+  ['xxxx_', 1e4], ['_xxxx', 1e4], ['xxx_x', 1e4], ['x_xxx', 1e4], ['xx_xx', 1e4],
+  ['_xxx__', 5e3], ['__xxx_', 5e3], ['_xx_x_', 5e3], ['_x_xx_', 5e3],
+  ['xxx__', 500], ['__xxx', 500], ['xx_x_', 500], ['_x_xx', 500], ['x_xx_', 500], ['_xx_x', 500],
+  ['xx__x', 400], ['x__xx', 400], ['x_x_x', 400], ['_xxx_', 450],
+  ['__xx__', 300], ['_x_x__', 200], ['__x_x_', 200], ['_x__x_', 120],
+  ['_xx__', 80], ['__xx_', 80], ['xx___', 50], ['___xx', 50], ['x_x__', 40], ['__x_x', 40],
+  ['__x__', 10], ['_x___', 6], ['___x_', 6], ['x', 1],
+];
+function dirScore(code) {
+  let v = dirCache[code];
+  if (v >= 0) return v;
+  let s = '';
+  for (let k = 0; k < 9; k++) { const d = Math.floor(code / POW3[k]) % 3; s += d === 0 ? '_' : d === 1 ? 'x' : 'o'; }
+  v = 0;
+  for (const [p, sc] of PATTERNS) {
+    if (sc <= v) continue;
+    const L = p.length;
+    for (let st = Math.max(0, 5 - L); st <= 4 && st + L <= 9; st++) if (s.substr(st, L) === p) { v = sc; break; }
+  }
+  dirCache[code] = v;
+  return v;
+}
+function cellScore(r, c, who) {
+  let total = 0, n4 = 0, n3 = 0, five = false;
+  for (const [dr, dc] of DR) {
+    let code = 0;
+    for (let k = -4; k <= 4; k++) {
+      let d;
+      if (k === 0) d = 1;
+      else {
+        const rr = r + k * dr, cc = c + k * dc;
+        if (!inB(rr, cc)) d = 2;
+        else { const v = board[rr * N + cc]; d = v === 0 ? 0 : v === who ? 1 : 2; }
+      }
+      code += d * POW3[k + 4];
+    }
+    const s = dirScore(code);
+    total += s;
+    if (s >= 1e6) five = true; else if (s >= 1e4) n4++; else if (s >= 5e3) n3++;
+  }
+  if (!five) {
+    if (n4 >= 2 || (n4 >= 1 && n3 >= 1)) total += 9e4;
+    else if (n3 >= 2) total += 4e4;
+  }
+  return total;
+}
+const mark = new Uint8Array(N * N);
+function candidates() {
+  mark.fill(0);
+  let stones = 0;
+  for (let i = 0; i < N * N; i++) {
+    if (!board[i]) continue;
+    stones++;
+    const r = (i / N) | 0, c = i % N;
+    for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+      const rr = r + dr, cc = c + dc;
+      if (inB(rr, cc) && !board[rr * N + cc]) mark[rr * N + cc] = 1;
+    }
+  }
+  if (!stones) return [{ r: 7, c: 7 }];
+  const out = [];
+  for (let i = 0; i < N * N; i++) if (mark[i]) out.push({ r: (i / N) | 0, c: i % N });
+  return out;
+}
+const at = m => m.r * N + m.c;
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+// Bảng băm Zobrist: mỗi thế cờ có một mã riêng để ghi nhớ kết quả đã tính
+const Z1 = new Uint32Array(N * N * 2), Z2 = new Uint32Array(N * N * 2);
+for (let i = 0; i < Z1.length; i++) { Z1[i] = (Math.random() * 4294967296) >>> 0; Z2[i] = (Math.random() * 4294967296) >>> 0; }
+let h1 = 0, h2 = 0;
+function zput(i, w) { board[i] = w; const k = (w - 1) * N * N + i; h1 = (h1 ^ Z1[k]) >>> 0; h2 = (h2 ^ Z2[k]) >>> 0; }
+function zdel(i) { const k = (board[i] - 1) * N * N + i; h1 = (h1 ^ Z1[k]) >>> 0; h2 = (h2 ^ Z2[k]) >>> 0; board[i] = 0; }
+function zreset() { board.fill(0); h1 = 0; h2 = 0; }
+// Đặt/gỡ quân thử trong lúc tìm kiếm (luôn theo thứ tự ngăn xếp để hoàn tác được khi hết giờ)
+const sstack = [];
+function sPut(i, w) { zput(i, w); sstack.push(i); }
+function sDel() { zdel(sstack.pop()); }
+const memo = new Map();
+const ABORT = {};
+let deadline = Infinity;
+function tick() { if (performance.now() > deadline) throw ABORT; }
+function timed(ms, fn) {
+  deadline = Math.min(performance.now() + ms, budgetEnd);
+  try { return fn(); }
+  catch (e) { if (e !== ABORT) throw e; while (sstack.length) sDel(); return null; }
+  finally { deadline = Infinity; }
+}
+let budgetEnd = Infinity;
+
+function wouldWin(m, who) {
+  sPut(at(m), who);
+  const w = checkWin(m.r, m.c, who);
+  sDel();
+  return !!w;
+}
+// Các ô trống nằm trên 4 đường đi qua ô m (trong phạm vi 4 ô)
+function lineCells(r, c) {
+  const out = [];
+  for (const [dr, dc] of DR) for (let k = -4; k <= 4; k++) {
+    if (!k) continue;
+    const rr = r + k * dr, cc = c + k * dc;
+    if (inB(rr, cc) && !board[rr * N + cc]) out.push({ r: rr, c: cc });
+  }
+  return out;
+}
+// Những ô mà `who` thắng ngay nhờ quân vừa đặt ở m
+const winsAround = (m, who) => lineCells(m.r, m.c).filter(p => wouldWin(p, who));
+
+// VCF: thắng bằng chuỗi "thế 4" liên tục, mỗi nước đối thủ chỉ có đúng 1 cách chặn
+function vcf(who, depth) {
+  if (depth <= 0) return null;
+  const key = 'F' + h1 + ':' + h2 + ':' + who + ':' + depth;
+  if (memo.has(key)) return memo.get(key);
+  tick();
+  const opp = 3 - who;
+  let res = null;
+  for (const m of candidates()) {
+    if (cellScore(m.r, m.c, who) < 1e4) continue;
+    sPut(at(m), who);
+    const wins = winsAround(m, who);
+    let ok = false;
+    if (wins.length >= 2) ok = true;
+    else if (wins.length === 1) {
+      const b = wins[0];
+      sPut(at(b), opp);
+      ok = !winsAround(b, opp).length && !!vcf(who, depth - 1);
+      sDel();
+    }
+    sDel();
+    if (ok) { res = m; break; }
+  }
+  memo.set(key, res);
+  return res;
+}
+
+// VCT: thắng bằng chuỗi đe dọa gồm cả "thế 3" lẫn "thế 4".
+// Với thế 3, đối thủ có nhiều cách chặn (và có thể phản công bằng thế 4): phải thắng được MỌI cách.
+const OPEN4 = 1e5;
+function threeDefenses(m, who) {
+  const T = lineCells(m.r, m.c).filter(p => cellScore(p.r, p.c, who) >= OPEN4);
+  if (!T.length) return null;
+  const out = [];
+  for (const d of lineCells(m.r, m.c)) {
+    sPut(at(d), 3 - who);
+    const still = T.some(t => !board[at(t)] && cellScore(t.r, t.c, who) >= OPEN4);
+    sDel();
+    if (!still) out.push(d);
+  }
+  return out;
+}
+function defenderLoses(who, m, depth, ply) {
+  const opp = 3 - who;
+  tick();
+  if (ply < 3) {
+    for (const d of candidates()) {
+      if (cellScore(d.r, d.c, opp) < 1e4) continue;
+      sPut(at(d), opp);
+      const w = winsAround(d, opp);
+      let lose = true;
+      if (w.length >= 2) lose = false;
+      else if (w.length === 1) {
+        sPut(at(w[0]), who);
+        lose = defenderLoses(who, m, depth, ply + 1);
+        sDel();
+      }
+      sDel();
+      if (!lose) return false;
+    }
+  }
+  const defs = threeDefenses(m, who);
+  if (defs === null) return false; // nước m không (còn) là mối đe dọa thật
+
+  if (!defs.length) return true;
+  for (const d of defs) {
+    sPut(at(d), opp);
+    const sub = vct(who, depth - 1);
+    sDel();
+    if (!sub) return false;
+  }
+  return true;
+}
+function vct(who, depth) {
+  const key = 'T' + h1 + ':' + h2 + ':' + who + ':' + depth;
+  if (memo.has(key)) return memo.get(key);
+  tick();
+  const opp = 3 - who;
+  const cands = candidates();
+  let res = cands.find(m => wouldWin(m, who)) || null;
+  if (!res && !cands.some(m => wouldWin(m, opp))) {
+    res = vcf(who, 10);
+    if (!res && depth > 0) {
+      const threats = cands.map(m => ({ m, s: cellScore(m.r, m.c, who) })).filter(x => x.s >= 5e3)
+        .sort((a, b) => b.s - a.s).slice(0, 10);
+      for (const { m } of threats) {
+        sPut(at(m), who);
+        let ok = false;
+        const wins = winsAround(m, who);
+        if (wins.length >= 2) ok = true;
+        else if (wins.length === 1) {
+          const b = wins[0];
+          sPut(at(b), opp);
+          ok = !winsAround(b, opp).length && !!vct(who, depth - 1);
+          sDel();
+        } else if (!vcf(opp, 8)) ok = defenderLoses(who, m, depth, 0);
+        sDel();
+        if (ok) { res = m; break; }
+      }
+    }
+  }
+  memo.set(key, res);
+  return res;
+}
+
+// Huyền thoại: tìm chuỗi thắng sâu, phá chuỗi thắng của đối thủ, đi nước gài thế
+const LEGEND = { budget: 3200, atk: 4, atkMs: 900, def: 5, defMs: 900, safeMs: 1300 };
+function legendMove(who, scored) {
+  const opp = 3 - who;
+  memo.clear();
+  budgetEnd = performance.now() + LEGEND.budget;
+  try {
+    let m = timed(500, () => vcf(who, 14));
+    if (m) return m;
+    const oppVcf = timed(300, () => vcf(opp, 12));
+    if (oppVcf) {
+      const safe = timed(700, () => scored.slice(0, 16).find(s => { sPut(at(s), who); const t = vcf(opp, 12); sDel(); return !t; }));
+      return safe || scored.find(s => s.r === oppVcf.r && s.c === oppVcf.c) || scored[0];
+    }
+    m = timed(LEGEND.atkMs, () => vct(who, LEGEND.atk));
+    if (m) return m;
+    const oppVct = timed(LEGEND.defMs, () => vct(opp, LEGEND.def));
+    if (oppVct) {
+      const safe = timed(LEGEND.safeMs, () => scored.slice(0, 14).find(s => { sPut(at(s), who); const t = vct(opp, LEGEND.def); sDel(); return !t; }));
+      if (safe) return safe;
+      const direct = scored.find(s => s.r === oppVct.r && s.c === oppVct.c);
+      if (direct) return direct;
+    }
+    const setup = timed(600, () => scored.slice(0, 8).find(s => {
+      sPut(at(s), who);
+      const t = !vcf(opp, 10) && vct(who, 2);
+      sDel();
+      return !!t;
+    }));
+    return setup || scored[0];
+  } finally {
+    budgetEnd = Infinity;
+  }
+}
+
+function aiMove(who, level) {
+  const opp = 3 - who;
+  const cands = candidates();
+  if (cands.length === 1 && !moves.length) return cands[0];
+  if (moves.length === 1) {
+    const m = moves[0], opts = [[1, 1], [1, -1], [-1, 1], [-1, -1], [0, 1], [1, 0]].map(([a, b]) => ({ r: m.r + a, c: m.c + b })).filter(p => inB(p.r, p.c));
+    return pick(opts);
+  }
+  for (const m of cands) if (wouldWin(m, who)) return m;
+  const block = cands.filter(m => wouldWin(m, opp));
+  if (block.length && (level !== 'de' || Math.random() < 0.75)) return block[0];
+
+  const scored = cands.map(m => ({ ...m, att: cellScore(m.r, m.c, who), def: cellScore(m.r, m.c, opp) }));
+  if (level === 'de') {
+    if (Math.random() < 0.15) return pick(scored);
+    scored.forEach(m => { m.k = m.att + m.def * 0.5; });
+    scored.sort((a, b) => b.k - a.k);
+    return pick(scored.slice(0, 4));
+  }
+  if (level === 'thuong') {
+    scored.forEach(m => { m.k = m.att + m.def * 0.95; });
+    scored.sort((a, b) => b.k - a.k);
+    const best = scored[0].k;
+    return pick(scored.filter(m => m.k >= best * 0.97));
+  }
+  // Khó: ưu tiên tấn công, tự tìm chuỗi thắng và phá chuỗi thắng của đối thủ
+  scored.forEach(m => { m.k = m.att + m.def * 0.7; });
+  scored.sort((a, b) => b.k - a.k);
+  if (level === 'legend') return legendMove(who, scored);
+  memo.clear();
+  const attack = vcf(who, 8);
+  if (attack) return attack;
+  if (vcf(opp, 6)) {
+    const safe = scored.slice(0, 14).find(m => {
+      sPut(at(m), who);
+      const threat = vcf(opp, 6);
+      sDel();
+      return !threat;
+    });
+    if (safe) return safe;
+  }
+  return scored[0];
+}
+
+// ================= Game flow =================
+function newGame() {
+  clearTimeout(thinkTimer); clearTimeout(overTimer);
+  zreset(); moves = []; turn = X; winLine = null; winner = 0; hint = null; pending = null; hintsUsed = 0;
+  el('over').hidden = true;
+  setState('play');
+  updateHud();
+  if (vsAI() && turn === aiSym()) aiTurn();
+}
+
+function place(r, c) {
+  if (state !== 'play' || !inB(r, c) || board[r * N + c]) return;
+  zput(r * N + c, turn);
+  moves.push({ r, c, who: turn, t: 0, seed: Math.random() });
+  Sound.tick(turn === X);
+  hint = null; pending = null;
+  const line = checkWin(r, c, turn);
+  if (line) { winLine = line; winner = turn; winT = 0; endGame(); return; }
+  if (moves.length === N * N) { winner = 0; endGame(); return; }
+  turn = 3 - turn;
+  updateHud();
+  if (vsAI() && turn === aiSym()) aiTurn();
+}
+
+function aiTurn() {
+  setState('thinking'); updateHud();
+  const started = performance.now();
+  thinkTimer = setTimeout(() => {
+    const m = aiMove(turn, settings.diff);
+    const wait = Math.max(0, 450 - (performance.now() - started));
+    thinkTimer = setTimeout(() => { setState('play'); place(m.r, m.c); }, wait);
+  }, 60);
+}
+
+function endGame() {
+  setState('over');
+  let title, emoji, sub;
+  if (winner) session[winner]++; else session.d++;
+  if (vsAI()) {
+    const rec = record[settings.diff] || { w: 0, l: 0, d: 0 };
+    if (!winner) rec.d++; else if (winner === me()) rec.w++; else rec.l++;
+    record[settings.diff] = rec; store.set('caro.record', record);
+    if (!winner) { title = 'HÒA CỜ!'; emoji = '🤝'; }
+    else if (winner === me()) { title = 'BẠN THẮNG!'; emoji = '🎉'; Sound.win(); }
+    else { title = 'MÁY THẮNG!'; emoji = '🤖'; Sound.lose(); }
+    sub = `Sau ${moves.length} nước · Độ khó ${DIFFS[settings.diff]} · Thành tích: ${rec.w} thắng, ${rec.l} thua, ${rec.d} hòa`;
+  } else {
+    title = !winner ? 'HÒA CỜ!' : winner === X ? 'NGƯỜI 1 (X) THẮNG!' : 'NGƯỜI 2 (O) THẮNG!';
+    emoji = winner ? '🏆' : '🤝';
+    if (winner) Sound.win();
+    sub = `Sau ${moves.length} nước · Tỉ số ${session[X]} : ${session[O]}`;
+  }
+  el('ovTitle').textContent = title; el('ovEmoji').textContent = emoji; el('ovSub').textContent = sub;
+  updateHud();
+  overTimer = setTimeout(() => { el('over').hidden = false; }, winner ? 1100 : 400);
+}
+
+function undo() {
+  if (state === 'thinking' || state === 'menu' || !moves.length) return;
+  clearTimeout(overTimer);
+  if (state === 'over') {
+    if (winner) session[winner]--; else session.d--;
+    winLine = null; winner = 0; el('over').hidden = true; setState('play');
+  }
+  do {
+    const m = moves.pop();
+    zdel(m.r * N + m.c);
+    turn = m.who;
+  } while (vsAI() && moves.length && turn !== me());
+  hint = null; pending = null;
+  updateHud();
+  if (vsAI() && turn === aiSym()) aiTurn();
+}
+
+function showHint() {
+  if (state !== 'play' || !humanTurn()) return;
+  const m = aiMove(turn, 'thuong');
+  hint = { r: m.r, c: m.c, t: 0 }; hintsUsed++;
+  Sound.hint();
+}
+
+// ================= Render =================
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = canvas.width = Math.round(window.innerWidth * dpr);
+  H = canvas.height = Math.round(window.innerHeight * dpr);
+  const top = 72 * dpr, bottom = 84 * dpr;
+  const avail = Math.min(W - 20 * dpr, H - top - bottom);
+  cell = Math.max(14 * dpr, Math.floor(avail / N));
+  bs = cell * N;
+  bx = Math.round((W - bs) / 2);
+  by = Math.round(top + Math.max(0, (H - top - bottom - bs) / 2));
+}
+function rr(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+const center = (r, c) => ({ x: bx + (c + 0.5) * cell, y: by + (r + 0.5) * cell });
+function fillCell(r, c, color) { ctx.fillStyle = color; ctx.fillRect(bx + c * cell + 1, by + r * cell + 1, cell - 1, cell - 1); }
+
+function drawX(x, y, p, seed, alpha = 1) {
+  const s = cell * 0.3, j = k => (Math.sin(seed * 99 + k) * 0.08) * s;
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#e0302f'; ctx.lineWidth = Math.max(2, cell * 0.11); ctx.lineCap = 'round';
+  const p1 = Math.min(1, p * 2), p2 = Math.max(0, p * 2 - 1);
+  const ax = x - s + j(1), ay = y - s + j(2), bx2 = x + s + j(3), by2 = y + s + j(4);
+  ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + (bx2 - ax) * p1, ay + (by2 - ay) * p1); ctx.stroke();
+  if (p2 > 0) {
+    const cx = x + s + j(5), cy = y - s + j(6), dx = x - s + j(7), dy = y + s + j(8);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + (dx - cx) * p2, cy + (dy - cy) * p2); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawO(x, y, p, seed, alpha = 1) {
+  const r = cell * 0.3, a0 = -Math.PI / 2 + (seed - 0.5) * 1.2;
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#1f5fd6'; ctx.lineWidth = Math.max(2, cell * 0.1); ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.ellipse(x, y, r * 1.02, r * 0.97, seed, a0, a0 + Math.PI * 2.08 * p); ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+const drawMark = (who, x, y, p, seed, a) => who === X ? drawX(x, y, p, seed, a) : drawO(x, y, p, seed, a);
+
+function render(dt) {
+  const bg = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.7);
+  bg.addColorStop(0, '#16204a'); bg.addColorStop(1, '#070a1c');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  const pad = Math.max(8, cell * 0.4);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 30 * dpr; ctx.shadowOffsetY = 10 * dpr;
+  ctx.fillStyle = '#fdfcf5'; rr(bx - pad, by - pad, bs + pad * 2, bs + pad * 2, 10 * dpr); ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(220,60,60,.35)'; ctx.lineWidth = 1.5 * dpr;
+  ctx.beginPath(); ctx.moveTo(bx - pad * 0.5, by - pad); ctx.lineTo(bx - pad * 0.5, by + bs + pad); ctx.stroke();
+
+  // highlights
+  const last = moves[moves.length - 1];
+  if (last && !winLine) fillCell(last.r, last.c, 'rgba(255,214,0,.3)');
+  if (winLine) {
+    const col = winner === X ? 'rgba(224,48,47,.16)' : 'rgba(31,95,214,.16)';
+    for (const p of winLine) fillCell(p.r, p.c, col);
+  }
+
+  // grid
+  ctx.strokeStyle = '#a9c8e8'; ctx.lineWidth = Math.max(1, dpr);
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const x = Math.round(bx + i * cell) + 0.5, y = Math.round(by + i * cell) + 0.5;
+    ctx.moveTo(x, by); ctx.lineTo(x, by + bs);
+    ctx.moveTo(bx, y); ctx.lineTo(bx + bs, y);
+  }
+  ctx.stroke();
+
+  // marks
+  for (const m of moves) {
+    m.t = Math.min(1, m.t + dt / 0.22);
+    const c = center(m.r, m.c);
+    drawMark(m.who, c.x, c.y, m.t, m.seed, 1);
+  }
+
+  // hint
+  if (hint) {
+    hint.t += dt;
+    const c = center(hint.r, hint.c), k = 1 + Math.sin(clock * 8) * 0.08;
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = Math.max(2, cell * 0.08);
+    ctx.beginPath(); ctx.arc(c.x, c.y, cell * 0.42 * k, 0, Math.PI * 2); ctx.stroke();
+    drawMark(turn, c.x, c.y, 1, 0.5, 0.35);
+    if (hint.t > 3) hint = null;
+  }
+
+  // ghost
+  const ghost = pending || (!isTouch && hover);
+  if (ghost && state === 'play' && humanTurn() && !board[ghost.r * N + ghost.c]) {
+    const c = center(ghost.r, ghost.c);
+    drawMark(turn, c.x, c.y, 1, 0.5, pending ? 0.6 : 0.3);
+    if (pending) { ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = dpr; ctx.strokeRect(bx + ghost.c * cell + 2, by + ghost.r * cell + 2, cell - 4, cell - 4); }
+  }
+
+  // win line
+  if (winLine) {
+    winT = Math.min(1, winT + dt / 0.5);
+    const a = center(winLine[0].r, winLine[0].c), b = center(winLine[winLine.length - 1].r, winLine[winLine.length - 1].c);
+    const ext = 0.35, dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+    const sx = a.x - dx / len * cell * ext, sy = a.y - dy / len * cell * ext;
+    const ex = b.x + dx / len * cell * ext, ey = b.y + dy / len * cell * ext;
+    ctx.strokeStyle = winner === X ? 'rgba(224,48,47,.85)' : 'rgba(31,95,214,.85)';
+    ctx.lineWidth = Math.max(3, cell * 0.13); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (ex - sx) * winT, sy + (ey - sy) * winT); ctx.stroke();
+  }
+}
+
+// ================= UI =================
+function setState(s) { state = s; document.body.dataset.state = s; }
+function flash(text) { const f = el('flash'); f.textContent = text; f.className = ''; void f.offsetWidth; f.className = 'show'; }
+function updateHud() {
+  const ai = vsAI();
+  el('nX').textContent = ai ? (me() === X ? 'BẠN' : 'MÁY') : 'NGƯỜI 1';
+  el('nO').textContent = ai ? (me() === O ? 'BẠN' : 'MÁY') : 'NGƯỜI 2';
+  el('scX').textContent = session[X]; el('scO').textContent = session[O];
+  for (const who of [X, O]) {
+    const card = el(who === X ? 'pX' : 'pO'), s = el(who === X ? 'sX' : 'sO');
+    const active = (state === 'play' || state === 'thinking') && turn === who;
+    card.classList.toggle('on', active);
+    const isAI = ai && who === aiSym();
+    s.classList.toggle('dots', active && isAI && state === 'thinking');
+    s.textContent = state === 'over' ? (winner === who ? 'Thắng ván này 🏆' : '')
+      : active ? (isAI ? 'Đang suy nghĩ' : (ai ? 'Lượt của bạn' : 'Đến lượt')) : '';
+  }
+  const btnUndo = document.querySelector('#bar [data-act="undo"]'), btnHint = document.querySelector('#bar [data-act="hint"]');
+  btnUndo.disabled = !moves.length || state === 'thinking';
+  btnHint.disabled = state !== 'play' || !humanTurn();
+}
+function syncOptions() {
+  document.querySelectorAll('.seg').forEach(seg => {
+    const key = seg.dataset.opt;
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === settings[key]));
+  });
+  document.querySelectorAll('[data-ai]').forEach(o => { o.hidden = !vsAI(); });
+  el('ruleNote').textContent = settings.block === 'block'
+    ? 'Dãy 5 quân bị đối phương chặn cả 2 đầu sẽ không được tính thắng.'
+    : 'Cứ có 5 quân liên tiếp là thắng.';
+  const r = record[settings.diff];
+  el('menuRecord').innerHTML = vsAI()
+    ? (r ? `Thành tích (${DIFFS[settings.diff]}): <b>${r.w} thắng</b> · ${r.l} thua · ${r.d} hòa` : 'Chưa chơi ván nào ở độ khó này.')
+    : 'Hai người chơi lần lượt trên cùng một máy.';
+}
+function startFromMenu() {
+  Sound.init();
+  session = { [X]: 0, [O]: 0, d: 0 };
+  el('menu').hidden = true;
+  newGame();
+}
+function toMenu() {
+  clearTimeout(thinkTimer); clearTimeout(overTimer);
+  el('over').hidden = true;
+  setState('menu'); syncOptions(); el('menu').hidden = false; updateHud();
+}
+function toggleMute() { Sound.setMuted(!Sound.muted); el('muteBtn').textContent = Sound.muted ? '🔇' : '🔊'; }
+
+// ================= Input =================
+function cellAt(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * dpr, y = (e.clientY - rect.top) * dpr;
+  const c = Math.floor((x - bx) / cell), r = Math.floor((y - by) / cell);
+  return inB(r, c) ? { r, c } : null;
+}
+canvas.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') hover = cellAt(e); });
+canvas.addEventListener('pointerleave', () => { hover = null; });
+canvas.addEventListener('pointerdown', e => {
+  Sound.init();
+  if (state !== 'play' || !humanTurn()) return;
+  const p = cellAt(e);
+  if (!p || board[p.r * N + p.c]) { pending = null; return; }
+  if (e.pointerType === 'mouse') { place(p.r, p.c); return; }
+  // Trên màn hình cảm ứng: chạm lần 1 để chọn, chạm lần 2 để đặt quân
+  if (pending && pending.r === p.r && pending.c === p.c) place(p.r, p.c);
+  else pending = p;
+});
+
+document.addEventListener('click', e => {
+  const seg = e.target.closest('.seg button');
+  if (seg) { settings[seg.parentElement.dataset.opt] = seg.dataset.v; store.set('caro.settings', settings); syncOptions(); return; }
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  b.blur();
+  const a = b.dataset.act;
+  if (a === 'start') startFromMenu();
+  else if (a === 'new') { Sound.init(); newGame(); }
+  else if (a === 'undo') undo();
+  else if (a === 'hint') showHint();
+  else if (a === 'menu') toMenu();
+  else if (a === 'view') el('over').hidden = true;
+});
+el('muteBtn').addEventListener('click', e => { e.currentTarget.blur(); toggleMute(); });
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  if (e.code === 'KeyU' || ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ')) { e.preventDefault(); undo(); }
+  else if (e.code === 'KeyH') showHint();
+  else if (e.code === 'KeyN' && state !== 'menu') newGame();
+  else if (e.code === 'KeyM') toggleMute();
+  else if (e.code === 'Enter' && state === 'menu') startFromMenu();
+});
+window.addEventListener('resize', resize);
+
+if (isTouch) document.body.classList.add('touch');
+if (window.top !== window.self) document.body.classList.add('embedded');
+if (Sound.muted) el('muteBtn').textContent = '🔇';
+
+// ================= Loop =================
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000);
+  last = now; clock += dt;
+  render(dt);
+  requestAnimationFrame(frame);
+}
+resize();
+syncOptions();
+updateHud();
+setState('menu');
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
