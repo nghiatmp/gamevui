@@ -48,8 +48,14 @@ window.GAMES = [
   },
   { id: 'xep-gach', title: 'Xếp Gạch', cats: ['co-dien', 'tri-tue'], status: 'dev', badge: 'hot', added: '2026-09-12',
     emoji: '🧱', colors: ['#7b2ff7', '#2b1a7a'], desc: 'Xoay và xếp các khối gạch rơi xuống để lấp đầy hàng ngang và ghi điểm.' },
-  { id: '2048', title: '2048', cats: ['tri-tue'], status: 'dev', badge: '', added: '2026-09-01',
-    emoji: '🔢', colors: ['#f7b733', '#fc4a1a'], desc: 'Trượt và ghép các ô số giống nhau để tạo ra ô 2048 huyền thoại.' },
+  {
+    id: '2048', title: '2048', cats: ['tri-tue'], status: 'live', badge: 'new', added: '2026-10-09',
+    url: 'games/2048/index.html', thumb: 'assets/thumbs/2048.jpg',
+    emoji: '🔢', colors: ['#f7b733', '#fc4a1a'],
+    desc: 'Trượt các ô số, ghép hai ô giống nhau thành một để tạo ra ô 2048 huyền thoại. Đơn giản, dễ chơi nhưng cực kỳ gây nghiện!',
+    longDesc: 'Có 4 cỡ bàn: 3×3 (rất khó), 4×4 (chuẩn), 5×5 và 6×6 (chơi được lâu). Mỗi ván được đi lại 3 lần. Ván đang chơi được tự lưu, tắt trình duyệt mở lại vẫn chơi tiếp được. Đạt 2048 rồi vẫn có thể chơi tiếp để chinh phục 4096, 8192...',
+    controls: [['↑ / ↓ / ← / →', 'Dồn các ô'], ['W / A / S / D', 'Dồn các ô'], ['Vuốt', 'Dồn các ô (điện thoại)'], ['U', 'Đi lại'], ['N', 'Ván mới'], ['M', 'Tắt/bật âm thanh']],
+  },
   {
     id: 'co-caro', title: 'Cờ Caro', cats: ['2-nguoi', 'tri-tue'], status: 'live', badge: 'hot', added: '2026-10-09',
     url: 'games/co-caro/index.html', thumb: 'assets/thumbs/co-caro.jpg',
