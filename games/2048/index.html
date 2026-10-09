@@ -42,7 +42,6 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .tool:hover{background:#232a5e}
 .tool:disabled{opacity:.4;cursor:not-allowed}
 .tool.ico{padding:0;width:38px;font-size:16px}
-body.embedded #homeBtn{display:none}
 .hint{font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5}
 .t-only{display:none} body.touch .t-only{display:inline} body.touch .k-only{display:none}
 
@@ -114,6 +113,7 @@ body.embedded #homeBtn{display:none}
   .tool.ico{flex:0 0 38px}
   .tool .lbl{display:none}
 }
+a.btn{text-decoration:none;display:inline-block}
 </style>
 </head>
 <body>
@@ -352,7 +352,8 @@ function showPlus(n) {
 }
 function overlay(emoji, title, text, buttons) {
   el('ovEmoji').textContent = emoji; el('ovTitle').textContent = title; el('ovText').innerHTML = text;
-  el('ovBtns').innerHTML = buttons.map(b => `<button class="btn ${b.ghost ? 'ghost' : ''}" data-act="${b.act}">${b.label}</button>`).join('');
+  el('ovBtns').innerHTML = buttons.map(b => `<button class="btn ${b.ghost ? 'ghost' : ''}" data-act="${b.act}">${b.label}</button>`).join('') +
+    '<a class="btn ghost home-link" href="../../index.html" target="_top">⌂ TRANG CHỦ</a>';
   el('overlay').hidden = false;
 }
 function hideOverlay() { el('overlay').hidden = true; }

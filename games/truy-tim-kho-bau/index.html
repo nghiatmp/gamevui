@@ -26,7 +26,6 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
   display:inline-flex;align-items:center;justify-content:center;gap:5px;font-weight:800;font-size:14px;color:#fff;text-decoration:none}
 .tool:hover{background:rgba(255,255,255,.16)}
 .tool:disabled{opacity:.4;cursor:not-allowed}
-body.embedded #homeBtn{display:none}
 
 #stage{flex:1 1 auto;position:relative;min-height:0}
 #game{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -102,6 +101,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 5px;border-radius:5px;backgr
   .checks{margin:4px auto 10px}
   .emoji{display:none}
 }
+a.btn{text-decoration:none;display:inline-block}
 </style>
 </head>
 <body>
@@ -139,7 +139,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 5px;border-radius:5px;backgr
     </div>
     <div class="total" id="totalStars"></div>
     <div class="levels" id="levelGrid"></div>
-    <button class="btn" id="playBtn">BẮT ĐẦU ▶</button>
+    <div class="btns"><button class="btn" id="playBtn">BẮT ĐẦU ▶</button><a class="btn ghost home-link" href="../../index.html" target="_top">⌂ TRANG CHỦ</a></div>
   </div>
 </div>
 
@@ -153,6 +153,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 5px;border-radius:5px;backgr
       <button class="btn" id="nextBtn">MÀN TIẾP ▶</button>
       <button class="btn ghost" data-act="restart">CHƠI LẠI</button>
       <button class="btn ghost" data-act="levels" id="winLevels">CHỌN MÀN</button>
+      <a class="btn ghost home-link" href="../../index.html" target="_top">⌂ TRANG CHỦ</a>
     </div>
   </div>
 </div>
@@ -165,6 +166,7 @@ kbd{display:inline-block;min-width:20px;padding:1px 5px;border-radius:5px;backgr
     <div class="btns">
       <button class="btn" data-act="undo">↶ ĐI LẠI</button>
       <button class="btn ghost" data-act="restart">↻ CHƠI LẠI MÀN</button>
+      <a class="btn ghost home-link" href="../../index.html" target="_top">⌂ TRANG CHỦ</a>
     </div>
   </div>
 </div>
