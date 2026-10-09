@@ -10,6 +10,8 @@ Website game vui: tổng hợp game online miễn phí, chơi ngay trên trình 
 | ⚽ **Sút Penalty** | Thể thao | Loạt sút luân lưu 5 lượt với máy, vừa sút vừa bắt gôn |
 | 🐍 **Rắn Săn Mồi** | Cổ điển | 3 độ khó, chế độ có tường hoặc xuyên tường, sao thưởng |
 | ⭕ **Cờ Caro** | Trí tuệ, 2 người | Đấu với máy 4 độ khó (đến 👑 Huyền thoại) hoặc 2 người chung máy, luật chặn 2 đầu |
+| 🔢 **2048** | Trí tuệ | 4 cỡ bàn 3×3 đến 6×6, đi lại 3 lần, tự lưu ván đang chơi |
+| ✈️ **Bắn Máy Bay** | Bắn súng, Hành động | 5 cấp vũ khí, 5 loại máy bay địch, trùm cuối sau mỗi 4 đợt, bom, khiên, combo |
 
 Các game khác trong danh sách đang được phát triển. Bấm vào sẽ hiện thông báo "Đang phát triển".
 
@@ -42,6 +44,8 @@ games/
   sut-penalty/index.html
   ran-san-moi/index.html
   co-caro/index.html
+  2048/index.html
+  ban-may-bay/index.html
 ```
 
 ## Thêm game mới
