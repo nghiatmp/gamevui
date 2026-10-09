@@ -649,25 +649,38 @@ function rr(x, y, w, h, r) {
 const center = (r, c) => ({ x: bx + (c + 0.5) * cell, y: by + (r + 0.5) * cell });
 function fillCell(r, c, color) { ctx.fillStyle = color; ctx.fillRect(bx + c * cell + 1, by + r * cell + 1, cell - 1, cell - 1); }
 
+// Mỗi quân được vẽ trong save/restore riêng và đặt màu ngay trước khi vẽ nét,
+// tránh lỗi Safari iOS vẽ quân O mới nhất bằng màu của quân X.
+const X_COLOR = '#e0302f', O_COLOR = '#1f5fd6';
+function strokeLine(x1, y1, x2, y2, color) {
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color; ctx.stroke();
+}
 function drawX(x, y, p, seed, alpha = 1) {
   const s = cell * 0.3, j = k => (Math.sin(seed * 99 + k) * 0.08) * s;
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = '#e0302f'; ctx.lineWidth = Math.max(2, cell * 0.11); ctx.lineCap = 'round';
+  ctx.save();
+  ctx.globalAlpha = alpha; ctx.lineWidth = Math.max(2, cell * 0.11); ctx.lineCap = 'round';
   const p1 = Math.min(1, p * 2), p2 = Math.max(0, p * 2 - 1);
   const ax = x - s + j(1), ay = y - s + j(2), bx2 = x + s + j(3), by2 = y + s + j(4);
-  ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + (bx2 - ax) * p1, ay + (by2 - ay) * p1); ctx.stroke();
+  strokeLine(ax, ay, ax + (bx2 - ax) * p1, ay + (by2 - ay) * p1, X_COLOR);
   if (p2 > 0) {
     const cx = x + s + j(5), cy = y - s + j(6), dx = x - s + j(7), dy = y + s + j(8);
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + (dx - cx) * p2, cy + (dy - cy) * p2); ctx.stroke();
+    strokeLine(cx, cy, cx + (dx - cx) * p2, cy + (dy - cy) * p2, X_COLOR);
   }
-  ctx.globalAlpha = 1;
+  ctx.restore();
 }
 function drawO(x, y, p, seed, alpha = 1) {
   const r = cell * 0.3, a0 = -Math.PI / 2 + (seed - 0.5) * 1.2;
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = '#1f5fd6'; ctx.lineWidth = Math.max(2, cell * 0.1); ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.ellipse(x, y, r * 1.02, r * 0.97, seed, a0, a0 + Math.PI * 2.08 * p); ctx.stroke();
-  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.globalAlpha = alpha; ctx.lineWidth = Math.max(2, cell * 0.1); ctx.lineCap = 'round';
+  // Vòng tròn chính (tối đa đúng 360°) + một nét nhỏ vượt qua điểm đầu cho giống viết tay
+  ctx.beginPath(); ctx.arc(x, y, r, a0, a0 + Math.PI * 2 * Math.min(1, p));
+  ctx.strokeStyle = O_COLOR; ctx.stroke();
+  if (p >= 1) {
+    ctx.beginPath(); ctx.arc(x, y, r * 1.04, a0, a0 + 0.25);
+    ctx.strokeStyle = O_COLOR; ctx.stroke();
+  }
+  ctx.restore();
 }
 const drawMark = (who, x, y, p, seed, a) => who === X ? drawX(x, y, p, seed, a) : drawO(x, y, p, seed, a);
 
@@ -693,14 +706,14 @@ function render(dt) {
   }
 
   // grid
-  ctx.strokeStyle = '#a9c8e8'; ctx.lineWidth = Math.max(1, dpr);
+  ctx.lineWidth = Math.max(1, dpr);
   ctx.beginPath();
   for (let i = 0; i <= N; i++) {
     const x = Math.round(bx + i * cell) + 0.5, y = Math.round(by + i * cell) + 0.5;
     ctx.moveTo(x, by); ctx.lineTo(x, by + bs);
     ctx.moveTo(bx, y); ctx.lineTo(bx + bs, y);
   }
-  ctx.stroke();
+  ctx.strokeStyle = '#a9c8e8'; ctx.stroke();
 
   // marks
   for (const m of moves) {
@@ -713,8 +726,9 @@ function render(dt) {
   if (hint) {
     hint.t += dt;
     const c = center(hint.r, hint.c), k = 1 + Math.sin(clock * 8) * 0.08;
-    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = Math.max(2, cell * 0.08);
-    ctx.beginPath(); ctx.arc(c.x, c.y, cell * 0.42 * k, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineWidth = Math.max(2, cell * 0.08);
+    ctx.beginPath(); ctx.arc(c.x, c.y, cell * 0.42 * k, 0, Math.PI * 2);
+    ctx.strokeStyle = '#22c55e'; ctx.stroke();
     drawMark(turn, c.x, c.y, 1, 0.5, 0.35);
     if (hint.t > 3) hint = null;
   }
@@ -734,9 +748,9 @@ function render(dt) {
     const ext = 0.35, dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
     const sx = a.x - dx / len * cell * ext, sy = a.y - dy / len * cell * ext;
     const ex = b.x + dx / len * cell * ext, ey = b.y + dy / len * cell * ext;
-    ctx.strokeStyle = winner === X ? 'rgba(224,48,47,.85)' : 'rgba(31,95,214,.85)';
     ctx.lineWidth = Math.max(3, cell * 0.13); ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (ex - sx) * winT, sy + (ey - sy) * winT); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (ex - sx) * winT, sy + (ey - sy) * winT);
+    ctx.strokeStyle = winner === X ? 'rgba(224,48,47,.85)' : 'rgba(31,95,214,.85)'; ctx.stroke();
   }
 }
 
