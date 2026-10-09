@@ -100,6 +100,12 @@ window.GAMES = [
     emoji: '🐭', colors: ['#c79081', '#7a4a3a'], desc: 'Nhanh tay đập những chú chuột tinh nghịch vừa thò đầu lên khỏi hang.' },
   { id: 'dau-cung', title: 'Đấu Cung 2 Người', cats: ['ban-sung', '2-nguoi'], status: 'dev', badge: '', added: '2026-06-20',
     emoji: '🏹', colors: ['#8e9eab', '#3b4a5a'], desc: 'Canh góc và lực bắn tên hạ gục đối thủ. Chơi chung một máy cùng bạn bè.' },
-  { id: 'kho-bau', title: 'Truy Tìm Kho Báu', cats: ['phieu-luu'], status: 'dev', badge: '', added: '2026-06-10',
-    emoji: '💎', colors: ['#11998e', '#0a4f4a'], desc: 'Khám phá hòn đảo bí ẩn, giải câu đố và tìm ra kho báu bị chôn giấu.' },
+  {
+    id: 'truy-tim-kho-bau', title: 'Truy Tìm Kho Báu', cats: ['phieu-luu', 'tri-tue'], status: 'live', badge: 'new', added: '2026-10-09',
+    url: 'games/truy-tim-kho-bau/index.html', thumb: 'assets/thumbs/truy-tim-kho-bau.jpg',
+    emoji: '💎', colors: ['#11998e', '#0a4f4a'],
+    desc: 'Khám phá hòn đảo bí ẩn qua 10 màn giải đố: mở cửa bằng chìa khóa, đẩy đá làm cầu, bật công tắc mở cổng và né lũ cua để chạm tới rương kho báu!',
+    longDesc: 'Mỗi bước bạn đi, lũ cua cũng bò một bước, nên phải tính toán thời điểm thật khéo. Đẩy tảng đá xuống nước để làm cầu, đẩy lên công tắc để mở cổng sắt. Mỗi màn có 3 sao: tìm thấy kho báu, nhặt đủ vàng và về đích trong số bước cho phép. Được đi lại thoải mái nếu lỡ bước sai, tiến độ được tự lưu.',
+    controls: [['↑ / ↓ / ← / →', 'Di chuyển, đẩy đá'], ['W / A / S / D', 'Di chuyển'], ['Vuốt', 'Di chuyển (điện thoại)'], ['U / Z', 'Đi lại'], ['R', 'Chơi lại màn'], ['M', 'Tắt/bật âm thanh']],
+  },
 ];

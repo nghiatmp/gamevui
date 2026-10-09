@@ -12,6 +12,7 @@ Website game vui: tổng hợp game online miễn phí, chơi ngay trên trình 
 | ⭕ **Cờ Caro** | Trí tuệ, 2 người | Đấu với máy 4 độ khó (đến 👑 Huyền thoại) hoặc 2 người chung máy, luật chặn 2 đầu |
 | 🔢 **2048** | Trí tuệ | 4 cỡ bàn 3×3 đến 6×6, đi lại 3 lần, tự lưu ván đang chơi |
 | ✈️ **Bắn Máy Bay** | Bắn súng, Hành động | 5 cấp vũ khí, 5 loại máy bay địch, trùm cuối sau mỗi 4 đợt, bom, khiên, combo |
+| 💎 **Truy Tìm Kho Báu** | Phiêu lưu, Trí tuệ | 10 màn giải đố: chìa khóa, đẩy đá làm cầu, công tắc mở cổng, né cua; 3 sao mỗi màn |
 
 Các game khác trong danh sách đang được phát triển. Bấm vào sẽ hiện thông báo "Đang phát triển".
 
@@ -46,6 +47,9 @@ games/
   co-caro/index.html
   2048/index.html
   ban-may-bay/index.html
+  truy-tim-kho-bau/index.html
+tools/
+  kiem-tra-kho-bau.js   Bộ giải kiểm tra các màn Truy Tìm Kho Báu
 ```
 
 ## Thêm game mới
@@ -55,3 +59,13 @@ games/
 3. Trong `assets/games.js`, thêm (hoặc sửa) mục của game: đặt `status: 'live'`, khai báo `url`, `thumb`, mô tả và bảng phím điều khiển.
 
 Mỗi game nên có nút ⌂ về trang chủ, tự ẩn khi game được nhúng trong trang `game.html`.
+
+## Thiết kế màn Truy Tìm Kho Báu
+
+Các màn nằm trong mảng `LEVELS` của `games/truy-tim-kho-bau/index.html` (ký hiệu ô được ghi chú ngay trên mảng). Sau khi thêm hoặc sửa màn, chạy:
+
+```bash
+node tools/kiem-tra-kho-bau.js
+```
+
+Lệnh này kiểm tra mọi màn đều giải được và in ra số bước ít nhất khi nhặt đủ vàng. Hãy đặt con số đó vào trường `par` của màn (sao thứ 3 tính theo `par`).
